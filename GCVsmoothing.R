@@ -36,18 +36,18 @@ RawPdg = function(inputData){
 ### Convert Vector (Log Periodogram) to Matrix
 ### Columns are objects, with time series are stacked in rows.
 VecToMatrix = function(inputData, ch, T, J){
-  matrixp=matrix(0,T/2-1,ch)
-  J=T/2-1
+  matrixp = matrix(0,T/2-1,ch)
+  J = T / 2 - 1
   for(i in 1:ch){
-    matrixp[,i]= inputData[((i-1)*J+1):(i*J)]
+    matrixp[, i]= inputData[((i-1) * J+1):(i * J)]
   }
   return(matrixp)
 }
 
 #define neighborhood
-neighborhood = function(x,x.star,y,bandwidth){
-  index=c(1:length(x))
-  indexn = index[(x<(x.star+bandwidth+1)) & (x>(x.star-bandwidth-1))]
+neighborhood = function(x, x.star, y, bandwidth){
+  index = c(1:length(x))
+  indexn = index[(x < (x.star + bandwidth + 1)) & (x > (x.star - bandwidth - 1))]
   xn = x[indexn]
   yn = y[indexn]
   out=list(xn,yn)
@@ -56,43 +56,43 @@ neighborhood = function(x,x.star,y,bandwidth){
 }
 
 #Calculate local estimate
-localEstimates=function(xn,yn,bandwith){
+localEstimates = function(xn, yn, bandwith){
   #boxcar smoother W = 1/(2p+1)
-  w=rep(1/(2*bandwith + 1),length(xn))
-  f.hat = as.numeric((t(w)%*%yn)/sum(w) )
+  w = rep(1 / (2 * bandwith + 1),length(xn))
+  f.hat = as.numeric((t(w) %*% yn) / sum(w) )
   #f.hat = sum(yn)/(2*bandwith + 1)
   return(f.hat)
 }
 
 ### Average Channel by using local channel around it.
-AvgChannel = function(inputData,channel){
+AvgChannel = function(inputData, channel){
   for(i in 1:160){
-    inputData[i,channel] = mean(c(inputData[i,(channel-5):(channel-1)],inputData[i,(channel+1):(channel+5)]))
+    inputData[i, channel] = mean(c(inputData[i, (channel-5):(channel-1)],inputData[i, (channel+1):(channel+5)]))
   }
   return(inputData)
 }
 
-SmoothGVC = function(matrix.Rawpdg,span){
+SmoothGVC = function(matrix.Rawpdg, span){
   GVCp = rep(0,length(span))
   span.min = 0
   n.trial = dim(matrix.Rawpdg)[1]
-  matrix.smooth = matrix(0,dim(matrix.Rawpdg)[1],dim(matrix.Rawpdg)[2])
+  matrix.smooth = matrix(0, dim(matrix.Rawpdg)[1], dim(matrix.Rawpdg)[2])
   y.estimate = matrix(0,length(span),dim(matrix.Rawpdg)[2])
   for(k in 1:n.trial){
-    if(min(matrix.Rawpdg[k,])==0){ind=which(matrix.Rawpdg[k,]==0)
-    matrix.Rawpdg[k,ind]=1e-30
+    if(min(matrix.Rawpdg[k,]) == 0){ind = which(matrix.Rawpdg[k, ]==0)
+    matrix.Rawpdg[k, ind] = 1e-30
     }
     for(i in 1:(length(span))){
       bandwidth = span[i]
-      first.trial.process = ProcessRawPdg(matrix.Rawpdg[k,],bandwidth)
-      x.feq = seq(1,length(first.trial.process),1)
-      for(j in 1:length(matrix.Rawpdg[k,])){
-        window = neighborhood(x=x.feq,x.star=x.feq[j]+bandwidth,y=first.trial.process,bandwidth)
-        y.estimate[i,j]=localEstimates(window$xn,window$yn,bandwidth)
+      first.trial.process = ProcessRawPdg(matrix.Rawpdg[k, ], bandwidth)
+      x.feq = seq(1, length(first.trial.process), 1)
+      for(j in 1:length(matrix.Rawpdg[k, ])){
+        window = neighborhood(x=x.feq, x.star=x.feq[j]+bandwidth, y=first.trial.process, bandwidth)
+        y.estimate[i, j]=localEstimates(window$xn, window$yn, bandwidth)
       }
-      GVCp[i] = CalculateGVC(matrix.Rawpdg[k,], y.estimate[i,], bandwidth)
+      GVCp[i] = CalculateGVC(matrix.Rawpdg[k, ], y.estimate[i, ], bandwidth)
     }
-    matrix.smooth[k,] = y.estimate[which(GVCp == min(GVCp)),]
+    matrix.smooth[k, ] = y.estimate[which(GVCp == min(GVCp)),]
   }  
   return(matrix.smooth)
 }
@@ -103,11 +103,11 @@ CalculateGVC = function(f, f.hat, bandwidth){
   sum = 0
   q = c(0.5,rep(1,M-2),0.5)
   for(i in 1:M){
-    num = -log(f[i]/f.hat[i])+(f[i]-f.hat[i])/f.hat[i]
-    dem = (1 - (1/(2*bandwidth + 1)))^2
-    sum = sum + q[i]*(num/dem)
+    num = -log(f[i] / f.hat[i]) + (f[i] - f.hat[i]) / f.hat[i]
+    dem = (1 - (1 / (2 * bandwidth + 1))) ^ 2
+    sum = sum + q[i]*(num / dem)
   }
-  return(sum/M)
+  return(sum / M)
 }
 
 ProcessRawPdg = function(pdg,bandwidth){
@@ -212,11 +212,11 @@ for(i in 1:r){dcr[i, i] = 10000}
 }
 
 ##distance matrix using fm
-distfm= function(x){
-  d=dim(x)
-  p=d[1]
-  q=d[2]
-  r=d[3]
+distfm = function(x){
+  d = dim(x)
+  p = d[1]
+  q = d[2]
+  r = d[3]
 
   dis=matrix(0,r,r)
   for(i in 1:(r-1)){
@@ -229,90 +229,90 @@ distfm= function(x){
 }
 
 ##how many columns that is not empty
-notzero=function(x){
+notzero = function(x){
   d=dim(x)
   m=d[1]
   n=d[2]
   for(i in 1:m){
-    if(sum(x[i,]==rep(0,n))>0){
-      z=i-1 ;break
+    if(sum(x[i, ] == rep(0,n)) > 0){
+      z = i-1 ;break
     }
   }
   return(z)
 }
 
 ###get the functional median curve
-fmed=function(x){
-  dep=fMBD(t(x))
-  n=which.max(dep)
-  s=x[n,]
+fmed = function(x){
+  dep = fMBD(t(x))
+  n = which.max(dep)
+  s = x[n,]
   return(s)
 }
 
 ##central region clustering algorithm
-crclust=function(x,n){
-  
-  d=dim(x)
-  p=d[1]
-  q=d[2]
-  r=d[3]
-  record=matrix(0,r,r-n)
-  dd=rep(0,r)
-  t=1:r
-  sss=matrix(1,1,r)
-  s4=array(0,c(r*p,q,r))
+crclust = function(x, n){
+  d = dim(x)
+  p = d[1]
+  q = d[2]
+  r = d[3]
+  record = matrix(0,r,r-n)
+  dd = rep(0,r)
+  t = 1:r
+  sss = matrix(1, 1, r)
+  s4 = array(0, c(r * p, q, r))
   for (i in 1:r){
-    s4[1:p,,i]=x[,,i]
+    s4[1:p, , i]=x[ , , i]
   }
-  dis=distcr(x)
-  vb=1
+  dis = distcr(x)
+  vb = 1
   for(k in r:(n+1)){
-    ss=which(dis==dis[which.min(dis)],arr.ind=T)
-    t1=ss[1,]
-    if(t1[2]<=t1[1]){
-      tt=t1[1]
-      t1[1]=t1[2]
-      t1[2]=tt}
-    dd[vb]=dis[t1[1],t1[2]]
+    ss = which(dis == dis[which.min(dis)], arr.ind=T)
+    t1 = ss[1,]
+    if(t1[2] <= t1[1]){
+      tt = t1[1]
+      t1[1] = t1[2]
+      t1[2] = tt}
+    dd[vb] = dis[t1[1],t1[2]]
     vb=vb+1
-    s4[ (p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]]=s4[1:(p*sss[t1[2]]),,  t1[2]]
-    s4[,,t1[2]]=matrix(0,r*p,q)
-    sss[t1[1]]=sss[t1[1]]+sss[t1[2]]
-    sss[t1[2]]=0
-    bb=which(t==t[t1[2]])
-    t[bb]=t[t1[1]]
+    s4[(p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]] = s4[1:(p*sss[t1[2]]),,t1[2]]
+    s4[,,t1[2]] = matrix(0,r*p,q)
+    sss[t1[1]] = sss[t1[1]] + sss[t1[2]]
+    sss[t1[2]] = 0
+    bb = which(t == t[t1[2]])
+    t[bb] = t[t1[1]]
     for(i in 1:(r-1)){
       for (j in (i+1):r){
-        a=notzero(s4[,,i])
-        b=notzero(s4[,,j])
-        if (a==0 || b==0){
-          dis[i,j]=10000
-          dis[j,i]=10000}else{
-            dis[i,j]=central( cbind( t(s4[1:a,,i]),t(s4[1:b,,j])  ))
-            dis[j,i]=dis[i,j]
+        a = notzero(s4[,,i])
+        b = notzero(s4[,,j])
+        if (a == 0 || b == 0){
+          dis[i,j] = 10000
+          dis[j,i] = 10000}
+        else{
+            dis[i,j] = central( cbind( t(s4[1:a,,i]),t(s4[1:b,,j])  ))
+            dis[j,i] = dis[i,j]
           }
         
       }
-      record[,r+1-k]=t}
+      record[,r+1-k] = t}
   }
-  return(list(tt=sss,t=t,dd=dd,record=record))
+  return(list(tt = sss, t = t, dd = dd, record = record))
   }
 
 ##functionalmedian clustering 
-fmclust=function(x,n){
-  d=dim(x)
-  p=d[1]
-  q=d[2]
-  r=d[3]
-  record=matrix(0,r,r-n)
-  dd=rep(0,r)
-  t=1:r
-  sss=matrix(1,1,r)
-  s4=array(0,c(r*p,q,r))
+fmclust = function(x,n){
+  d = dim(x)
+  p = d[1]
+  q = d[2]
+  r = d[3]
+  record = matrix(0,r,r-n)
+  dd = rep(0,r)
+  t = 1:r
+  sss = matrix(1,1,r)
+  s4 = array(0,c(r*p,q,r))
   for (i in 1:r){
-    s4[1:p,,i]=x[,,i]
+    s4[1:p,,i] = x[,,i]
   }
-  dis=matrix(0,r,r)
+  dis = matrix(0,r,r)
   for(i in 1:(r-1)){
     for(j in (i+1):r){
        dis[i,j]=diss(fmed(x[,,i]),fmed(x[,,j]))
