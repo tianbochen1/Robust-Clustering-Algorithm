@@ -7,14 +7,14 @@ library(clusteval)
 LogPdg = function(inputData){
   data1 = as.matrix(inputData)
   
-  ch=dim(data1)[1];
-  T=dim(data1)[2];
-  J = floor((T+1)/2)-1;
+  ch = dim(data1)[1];
+  T = dim(data1)[2];
+  J = floor((T + 1) / 2) - 1;
   
   ##Calculate log periodogram
-  logp = rep(0,ch*J);
+  logp = rep(0, ch * J);
   for(i in 1:ch) {
-    logp[((i-1)*J+1):(i*J)] = log((1/T)*(abs(fft(data1[i,])[1:J]))^2);
+    logp[((i-1) * J + 1):(i * J)] = log((1 / T) * (abs(fft(data1[i, ])[1:J])) ^ 2);
   }
   
   return(logp+0.57721);
@@ -23,8 +23,8 @@ LogPdg = function(inputData){
 ### Periodogram not log periodograms
 RawPdg = function(inputData){
   data1 = as.matrix(inputData)
-  ch=dim(data1)[1];
-  T=dim(data1)[2];
+  ch = dim(data1)[1];
+  T = dim(data1)[2];
   J = floor((T+1)/2)-1;
   Rawp = rep(0,ch*J);
   for(i in 1:ch) {
@@ -315,412 +315,371 @@ fmclust = function(x,n){
   dis = matrix(0,r,r)
   for(i in 1:(r-1)){
     for(j in (i+1):r){
-       dis[i,j]=diss(fmed(x[,,i]),fmed(x[,,j]))
-       dis[j,i]=dis[i,j]
+       dis[i,j] = diss(fmed(x[,,i]),fmed(x[,,j]))
+       dis[j,i] = dis[i,j]
     }
   }
   
   for(i in 1:r){
-    dis[i,i]=10000
+    dis[i,i] = 10000
   }
   vb=1
   for(k in (r:(n+1))){
-    ss=which(dis==dis[which.min(dis)],arr.ind=T)
-    t1=ss[,1]
-    if(t1[2]<=t1[1]){
-      tt=t1[1]
-      t1[1]=t1[2]
-      t1[2]=tt}
-    dd[vb]=dis[t1[1],t1[2]]
-    vb=vb+1
-    s4[ (p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]]=s4[1:(p*sss[t1[2]]),,  t1[2]]
-    s4[,,t1[2]]=matrix(0,r*p,q)
-    sss[t1[1]]=sss[t1[1]]+sss[t1[2]]
-    sss[t1[2]]=0
-    bb=which(t==t[t1[2]])
-    t[bb]=t[t1[1]]
+    s s= which(dis == dis[which.min(dis)], arr.ind=T)
+    t1 = ss[,1]
+    if(t1[2] <= t1[1]){
+      tt = t1[1]
+      t1[1] = t1[2]
+      t1[2] = tt}
+    dd[vb] = dis[t1[1],t1[2]]
+    vb = vb+1
+    s4[(p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]] = s4[1:(p*sss[t1[2]]),,t1[2]]
+    s4[,,t1[2]] = matrix(0,r*p,q)
+    sss[t1[1]] = sss[t1[1]]+sss[t1[2]]
+    sss[t1[2]] = 0
+    bb = which(t == t[t1[2]])
+    t[bb] = t[t1[1]]
     for(i in 1:(r-1)){
       for (j in (i+1):r){
-        a=notzero(s4[,,i])
-        b=notzero(s4[,,j])
-        if (a==0 || b==0){
-          
-          dis[i,j]=10000
-          dis[j,i]=10000
-          }else{
-            
-            dis[i,j]=diss(fmed(s4[1:a,,i]),fmed(s4[1:b,,j]))
-          dis[j,i]=dis[i,j]
-            }
-        
+        a = notzero(s4[,,i])
+        b = notzero(s4[,,j])
+        if (a == 0 || b == 0){
+          dis[i,j] = 10000
+          dis[j,i] = 10000
+          }
+        else{
+          dis[i,j] = diss(fmed(s4[1:a,,i]),fmed(s4[1:b,,j]))
+          dis[j,i] = dis[i,j]
+          }        
       }
     }
-    record[,r+1-k]=t
+    record[,r+1-k] = t
   }
-  return(list(tt=sss,t=t,dd=dd,record=record))
+  return(list(tt=sss, t=t, dd=dd, record=record))
 }
 
 ##functional mean clustering
-meanclust=function(x,n){
-  d=dim(x)
-  p=d[1]
-  q=d[2]
-  r=d[3]
-  dd=rep(0,r)
-  record=matrix(0,r,r-n)
-  t=1:r
-  sss=matrix(1,1,r)
-  s4=array(0,c(r*p,q,r))
+meanclust = function(x, n){
+  d = dim(x)
+  p = d[1]
+  q = d[2]
+  r = d[3]
+  dd = rep(0,r)
+  record = matrix(0, r, r-n)
+  t = 1:r
+  sss = matrix(1, 1, r)
+  s4 = array(0,c(r*p,q,r))
   for (i in 1:r){
-    s4[1:p,,i]=x[,,i]
+    s4[1:p, ,i]=x[ , ,i]
   }
-  dis=matrix(0,r,r)
+  dis = matrix(0, r, r)
   for(i in 1:r){
     for(j in 1:r){
-      ctb=rbind(colMeans(x[,,i]),colMeans(x[,,j]))
-      dis[i,j]=as.matrix(dist(ctb))[1,2]
+      ctb = rbind(colMeans(x[,,i]), colMeans(x[,,j]))
+      dis[i,j] = as.matrix(dist(ctb))[1,2]
     }
   }
-  
  for(i in 1:r){
-   dis[i,i]=10000
+   dis[i,i] = 10000
  }
-  vb=1
+  vb = 1
   for(k in (r:(n+1))){
-    ss=which(dis==dis[which.min(dis)],arr.ind=T)
-    t1=ss[,1]
-    if(t1[2]<=t1[1]){
-      tt=t1[1]
-      t1[1]=t1[2]
-      t1[2]=tt}
-    dd[vb]=dis[t1[1],t1[2]]
-    vb=vb+1
-    s4[ (p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]]=s4[1:(p*sss[t1[2]]),,  t1[2]]
-    s4[,,t1[2]]=matrix(0,r*p,q)
-    sss[t1[1]]=sss[t1[1]]+sss[t1[2]]
-    sss[t1[2]]=0
-    bb=which(t==t[t1[2]])
-    t[bb]=t[t1[1]]
+    ss = which(dis == dis[which.min(dis)], arr.ind=T)
+    t1 = ss[, 1]
+    if(t1[2] <= t1[1]){
+      tt = t1[1]
+      t1[1] = t1[2]
+      t1[2] = tt}
+    dd[vb] = dis[t1[1],t1[2]]
+    vb = vb + 1
+    s4[(p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]] = s4[1:(p*sss[t1[2]]),,  t1[2]]
+    s4[,,t1[2]] = matrix(0,r*p,q)
+    sss[t1[1]] = sss[t1[1]]+sss[t1[2]]
+    sss[t1[2]] = 0
+    bb = which(t == t[t1[2]])
+    t[bb] = t[t1[1]]
     for(i in 1:(r-1)){
       for (j in (i+1):r){
-        a=notzero(s4[,,i])
-        b=notzero(s4[,,j])
-        if (a==0 || b==0){
-          dis[i,j]=10000
-          dis[j,i]=10000}else{
-            qw=rbind(colMeans(s4[1:a,,i]),colMeans(s4[1:b,,j]))
-            dis[i,j]=as.matrix(dist(qw))[1,2]
-            dis[j,i]=dis[i,j]
-          }
-        
+        a = notzero(s4[,,i])
+        b = notzero(s4[,,j])
+        if (a == 0 || b == 0){
+          dis[i,j] = 10000
+          dis[j,i] = 10000}else{
+            qw = rbind(colMeans(s4[1:a,,i]), colMeans(s4[1:b,,j]))
+            dis[i,j] = as.matrix(dist(qw))[1,2]
+            dis[j,i] = dis[i,j]
+          }        
       }
     }
-    record[,r+1-k]=t
+    record[, r + 1 - k] = t
   }
-  return(list(tt=sss,t=t,dd=dd,record=record))
+  return(list(tt=sss, t=t, dd=dd, record=record))
 }
 
-meanclust_tvd=function(x,n){
-  d=dim(x)
-  p=d[1]
-  q=d[2]
-  r=d[3]
-  dd=rep(0,r)
-  record=matrix(0,r,r-n)
-  t=1:r
-  sss=matrix(1,1,r)
-  s4=array(0,c(r*p,q,r))
+meanclust_tvd = function(x, n){
+  d = dim(x)
+  p = d[1]
+  q = d[2]
+  r = d[3]
+  dd = rep(0,r)
+  record = matrix(0,r,r-n)
+  t = 1:r
+  sss = matrix(1,1,r)
+  s4 = array(0,c(r*p,q,r))
   for (i in 1:r){
-    s4[1:p,,i]=x[,,i]
+    s4[1:p,,i] = x[,,i]
   }
-  dis=matrix(0,r,r)
+  dis = matrix(0,r,r)
   for(i in 1:r){
     for(j in 1:r){
-      dis[i,j]=tvd(colMeans(x[,,i]),colMeans(x[,,j]))
+      dis[i,j] = tvd(colMeans(x[,,i]),colMeans(x[,,j]))
     }
   }
-  
   for(i in 1:r){
-    dis[i,i]=10000
+    dis[i,i] = 10000
   }
-  vb=1
+  vb = 1
   for(k in (r:(n+1))){
-    ss=which(dis==dis[which.min(dis)],arr.ind=T)
-    t1=ss[,1]
-    if(t1[2]<=t1[1]){
-      tt=t1[1]
-      t1[1]=t1[2]
-      t1[2]=tt}
-    dd[vb]=dis[t1[1],t1[2]]
-    vb=vb+1
-    s4[ (p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]]=s4[1:(p*sss[t1[2]]),,  t1[2]]
-    s4[,,t1[2]]=matrix(0,r*p,q)
-    sss[t1[1]]=sss[t1[1]]+sss[t1[2]]
+    ss = which(dis == dis[which.min(dis)], arr.ind=T)
+    t1 = ss[,1]
+    if(t1[2] <= t1[1]){
+      tt = t1[1]
+      t1[1] = t1[2]
+      t1[2] = tt}
+    dd[vb] = dis[t1[1],t1[2]]
+    vb = vb+1
+    s4[(p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]] = s4[1:(p*sss[t1[2]]),,  t1[2]]
+    s4[,,t1[2]] = matrix(0,r*p,q)
+    sss[t1[1]] = sss[t1[1]] + sss[t1[2]]
     sss[t1[2]]=0
-    bb=which(t==t[t1[2]])
-    t[bb]=t[t1[1]]
+    bb = which(t == t[t1[2]])
+    t[bb] = t[t1[1]]
     for(i in 1:(r-1)){
       for (j in (i+1):r){
-        a=notzero(s4[,,i])
-        b=notzero(s4[,,j])
-        if (a==0 || b==0){
-          dis[i,j]=10000
-          dis[j,i]=10000}else{
-            dis[i,j]=tvd(colMeans(s4[1:a,,i]),colMeans(s4[1:b,,j]))
-            dis[j,i]=dis[i,j]
-          }
-        
+        a = notzero(s4[,,i])
+        b = notzero(s4[,,j])
+        if (a == 0 || b == 0){
+          dis[i,j] = 10000
+          dis[j,i] = 10000}else{
+            dis[i,j] = tvd(colMeans(s4[1:a,,i]),colMeans(s4[1:b,,j]))
+            dis[j,i] = dis[i,j]
+          }        
       }
     }
-    record[,r+1-k]=t
+    record[, r+1-k] = t
   }
-  return(list(tt=sss,t=t,dd=dd,record=record))
+  return(list(tt = sss,t = t,dd = dd, record = record))
 }
 
 meanclust_llrdls=function(x,n){
-  d=dim(x)
-  p=d[1]
-  q=d[2]
-  r=d[3]
-  record=matrix(0,r,r-n)
-  dd=rep(0,r)
-  t=1:r
-  sss=matrix(1,1,r)
-  s4=array(0,c(r*p,q,r))
+  d = dim(x)
+  p = d[1]
+  q = d[2]
+  r = d[3]
+  record = matrix(0,r,r-n)
+  dd = rep(0,r)
+  t = 1:r
+  sss = matrix(1,1,r)
+  s4 = array(0,c(r*p,q,r))
   for (i in 1:r){
-    s4[1:p,,i]=x[,,i]
+    s4[1:p,,i] = x[,,i]
   }
-  dis=matrix(0,r,r)
+  dis = matrix(0,r,r)
   for(i in 1:(r-1)){
     for(j in (i+1):r){
       dis[i,j] = diss_llr(colMeans(x[,,i]),colMeans(x[,,j]))
-      dis[j,i]=dis[i,j]
+      dis[j,i] = dis[i,j]
     }
   }
-  
   for(i in 1:r){
-    dis[i,i]=10000
+    dis[i,i] = 10000
   }
-  vb=1
+  vb = 1
   for(k in (r:(n+1))){
-    ss=which(dis==dis[which.min(dis)],arr.ind=T)
-    t1=ss[,1]
-    if(t1[2]<=t1[1]){
-      tt=t1[1]
-      t1[1]=t1[2]
-      t1[2]=tt}
-    dd[vb]=dis[t1[1],t1[2]]
-    vb=vb+1
-    s4[ (p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]]=s4[1:(p*sss[t1[2]]),,  t1[2]]
-    s4[,,t1[2]]=matrix(0,r*p,q)
-    sss[t1[1]]=sss[t1[1]]+sss[t1[2]]
-    sss[t1[2]]=0
-    bb=which(t==t[t1[2]])
-    t[bb]=t[t1[1]]
+    ss = which(dis == dis[which.min(dis)],arr.ind=T)
+    t1 = ss[,1]
+    if(t1[2] <= t1[1]){
+      tt = t1[1]
+      t1[1] = t1[2]
+      t1[2] = tt}
+    dd[vb] = dis[t1[1],t1[2]]
+    vb = vb+1
+    s4[(p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]] = s4[1:(p*sss[t1[2]]),,  t1[2]]
+    s4[,,t1[2]] = matrix(0,r*p,q)
+    sss[t1[1]] = sss[t1[1]]+sss[t1[2]]
+    sss[t1[2]] = 0
+    bb = which(t == t[t1[2]])
+    t[bb] = t[t1[1]]
     for(i in 1:(r-1)){
       for (j in (i+1):r){
-        a=notzero(s4[,,i])
-        b=notzero(s4[,,j])
-        if (a==0 || b==0){
-          dis[i,j]=10000
-          dis[j,i]=10000}else{
-            dis[i,j]=diss_llr(colMeans(s4[1:a,,i]),colMeans(s4[1:b,,j]))
-            dis[j,i]=dis[i,j]
+        a = notzero(s4[,,i])
+        b = notzero(s4[,,j])
+        if (a == 0 || b == 0){
+          dis[i,j] = 10000
+          dis[j,i] = 10000}else{
+            dis[i,j] = diss_llr(colMeans(s4[1:a,,i]),colMeans(s4[1:b,,j]))
+            dis[j,i] = dis[i,j]
           }
-        
       }
     }
-    record[,r+1-k]=t
+    record[,r+1-k] = t
   }
-  return(list(tt=sss,t=t,dd=dd,record=record))
+  return(list(tt=sss, t=t, dd=dd, record=record))
 }
 
-fmclust_tvd=function(x,n){
-  d=dim(x)
-  p=d[1]
-  q=d[2]
-  r=d[3]
-  record=matrix(0,r,r-n)
-  dd=rep(0,r)
-  t=1:r
-  sss=matrix(1,1,r)
-  s4=array(0,c(r*p,q,r))
+fmclust_tvd = function(x, n){
+  d = dim(x)
+  p = d[1]
+  q = d[2]
+  r = d[3]
+  record = matrix(0,r,r-n)
+  dd = rep(0,r)
+  t = 1:r
+  sss = matrix(1,1,r)
+  s4 = array(0,c(r*p,q,r))
   for (i in 1:r){
-    s4[1:p,,i]=x[,,i]
+    s4[1:p,,i] = x[,,i]
   }
-  dis=matrix(0,r,r)
+  dis = matrix(0,r,r)
   for(i in 1:(r-1)){
     for(j in (i+1):r){
-      dis[i,j]=tvd(fmed(x[,,i]),fmed(x[,,j]))
-      dis[j,i]=dis[i,j]
+      dis[i,j] = tvd(fmed(x[,,i]),fmed(x[,,j]))
+      dis[j,i] = dis[i,j]
     }
   }
-  
   for(i in 1:r){
-    dis[i,i]=10000
+    dis[i,i] = 10000
   }
-  vb=1
+  vb = 1
   for(k in (r:(n+1))){
-    ss=which(dis==dis[which.min(dis)],arr.ind=T)
-    t1=ss[,1]
-    if(t1[2]<=t1[1]){
-      tt=t1[1]
-      t1[1]=t1[2]
-      t1[2]=tt}
-    dd[vb]=dis[t1[1],t1[2]]
-    vb=vb+1
-    s4[ (p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]]=s4[1:(p*sss[t1[2]]),,  t1[2]]
-    s4[,,t1[2]]=matrix(0,r*p,q)
-    sss[t1[1]]=sss[t1[1]]+sss[t1[2]]
-    sss[t1[2]]=0
-    bb=which(t==t[t1[2]])
-    t[bb]=t[t1[1]]
+    ss = which(dis == dis[which.min(dis)], arr.ind=T)
+    t1 = ss[,1]
+    if(t1[2] <= t1[1]){
+      tt = t1[1]
+      t1[1] = t1[2]
+      t1[2] = tt}
+    dd[vb] = dis[t1[1],t1[2]]
+    vb = vb + 1
+    s4[(p*sss[t1[1]]+1):(p*(sss[t1[1]]+sss[t1[2]])),,t1[1]] = s4[1:(p*sss[t1[2]]),,t1[2]]
+    s4[,,t1[2]] = matrix(0,r*p,q)
+    sss[t1[1]] = sss[t1[1]] + sss[t1[2]]
+    sss[t1[2]] = 0
+    bb = which(t == t[t1[2]])
+    t[bb] = t[t1[1]]
     for(i in 1:(r-1)){
       for (j in (i+1):r){
-        a=notzero(s4[,,i])
-        b=notzero(s4[,,j])
-        if (a==0 || b==0){
-          
-          dis[i,j]=10000
-          dis[j,i]=10000
+        a = notzero(s4[,,i])
+        b = notzero(s4[,,j])
+        if (a == 0 || b == 0){        
+          dis[i,j] = 10000
+          dis[j,i] = 10000
         }else{
-          
-          dis[i,j]=tvd(fmed(s4[1:a,,i]),fmed(s4[1:b,,j]))
-          dis[j,i]=dis[i,j]
+          dis[i,j] = tvd(fmed(s4[1:a,,i]),fmed(s4[1:b,,j]))
+          dis[j,i] = dis[i,j]
         }
-        
       }
     }
-    record[,r+1-k]=t
+    record[, r+1-k] = t
   }
-  return(list(tt=sss,t=t,dd=dd,record=record))
+  return(list(tt=sss, t=t, dd=dd, record=record))
 }
 #standerize the clusters
-stdclu=function(x){
-   len=length(x)
-   s=rep(0,len)
-   cl=rep(0,len)
+stdclu = function(x){
+   len = length(x)
+   s = rep(0,len)
+   cl = rep(0,len)
    for(i in 1:len){
-      cl[i]=(x[i]==i)
+      cl[i] = (x[i] == i)
    }
-   num=sum(cl)
-   t=which(cl==1)
+   num = sum(cl)
+   t = which(cl == 1)
    for(i in 1:num){
-      p=which(x==t[i])
-      s[p]=i
+      p = which(x == t[i])
+      s[p] = i
    }
 return(s)
 }
                 
 #####TVD##################
-mi=function(x,y){
-  xymin=rep(0,length(x))
+mi = function(x, y){
+  xymin = rep(0,length(x))
   for(i in 1:length(x)){
-    xymin[i]=min(x[i],y[i])
+    xymin[i] = min(x[i],y[i])
   }
   return(xymin)
 }
 
-tvd=function(x,y){
-  x1=x-min(x)
-  y1=y-min(y)
-  x2=x1/sum(x1)
-  y2=y1/sum(y1)
-  tv=1-sum(mi(x2,y2))
+tvd = function(x, y){
+  x1 = x - min(x)
+  y1 = y - min(y)
+  x2 = x1 / sum(x1)
+  y2 = y1 / sum(y1)
+  tv = 1 - sum(mi(x2, y2))
   return(tv)
 }
 
 
-
-
-ranktest=function(dataX,dataY,dataRef)
+ranktest=function(dataX, dataY, dataRef)
 {
-  n=dim(dataX)[2];
-  m=dim(dataY)[2];
-  r=dim(dataRef)[2];
-  order=integer(n+m);
+  n = dim(dataX)[2];
+  m = dim(dataY)[2];
+  r = dim(dataRef)[2];
+  order = integer(n+m);
   for(i in 1:m)
   {
-    sample=cbind(dataRef,dataY[,i]);
-    result=fbplot(sample,plot=F);
-    order[i]=sum(result$depth[1:r]<=result$depth[r+1])
+    sample = cbind(dataRef, dataY[,i]);
+    result = fbplot(sample, plot=F);
+    order[i] = sum(result$depth[1:r] <= result$depth[r+1])
   }
   for(i in 1:n)
   {
-    sample=cbind(dataRef,dataX[,i]);
-    result=fbplot(sample,plot=F);
-    order[i+m]=sum(result$depth[1:r]<=result$depth[r+1])
+    sample = cbind(dataRef, dataX[,i]);
+    result = fbplot(sample,plot=F);
+    order[i+m] = sum(result$depth[1:r] <= result$depth[r+1])
   }
-  rk=sort.int(order,index.return = T)$ix;
-  w=sum(rk[1:m]);
+  rk = sort.int(order,index.return = T)$ix;
+  w = sum(rk[1:m]);
   return(w)
 }
 
 #combination
 
-combinat=function(n,p){
-  
-  if (n<p){combinat=0}
-  
-  else {combinat=exp(lfactorial(n)-(lfactorial(p)+lfactorial(n-p)))}
-  
+combinat=function(n, p){
+  if (n<p){combinat = 0}  
+  else {combinat = exp(lfactorial(n) - (lfactorial(p) + lfactorial(n-p)))  
 }
-
-
-
-
-
-
-
 #BD2
 
-fBD2=function(data){
-  
-  p=dim(data)[1]
-  
-  n=dim(data)[2]
-  
-  rmat=apply(data,1,rank)
-  
-  down=apply(rmat,1,min)-1
-  
-  up=n-apply(rmat,1,max)
-  
-  (up*down+n-1)/combinat(n,2)
-  
-  
-  
+fBD2 = function(data){  
+  p = dim(data)[1]
+  n = dim(data)[2]
+  rmat = apply(data, 1, rank)
+  down = apply(rmat, 1, min)-1
+  up = n - apply(rmat, 1, max)
+  (up*down+n-1) / combinat(n, 2)
+ }
+
+
+
+fMBD = function(data){
+  p = dim(data)[1] 
+  n = dim(data)[2]
+  rmat = apply(data,1,rank)
+  down = rmat-1
+  up = n - rmat
+  (rowSums(up*down) / p + n - 1) / combinat(n,2)
 }
 
 
-
-fMBD=function(data){
-  
-  p=dim(data)[1]
-  
-  n=dim(data)[2]
-  
-  rmat=apply(data,1,rank)
-  
-  down=rmat-1
-  
-  up=n-rmat
-  
-  (rowSums(up*down)/p+n-1)/combinat(n,2)
-  
-}
+diss=function(x1, x2){return(sqrt(sum((x1 - x2) ^ 2))) }
 
 
-diss=function(x1, x2){ return(sqrt(sum((x1 - x2) ^ 2))) }
-
-
-
-diss_llr = function(x,y){
-  w = function(u,v){
-    return(0.5*(log((0.5*u+0.5*v)/v  - 0.5*log(u/v) ) ))
+diss_llr = function(x, y){
+  w = function(u, v){
+    return(0.5 * (log((0.5*u+0.5*v)/v  - 0.5 * log(u/v) ) ))
   } 
-  x=exp(x)
-  y=exp(y)
+  x = exp(x)
+  y = exp(y)
   return(sum(w(x,y)+w(y,x)))
 }
 
